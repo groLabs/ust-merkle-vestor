@@ -17,9 +17,9 @@ contract GMerkleVestor is Ownable {
 	uint256 internal constant ONE_MONTH_SECONDS = 2592000; //60 * 60 * 24 * 30 (30 day months)
 	uint256 internal constant VESTING_TIME = ONE_MONTH_SECONDS * 23; // 2 years period - 1 month
 
-	address immutable token;
-	uint256 immutable vestingStartTime;
-	uint256 immutable vestingEndTime;
+	address public immutable token;
+	uint256 public immutable vestingStartTime;
+	uint256 public immutable vestingEndTime;
 	bytes32 immutable merkleRoot;
 	mapping(address => bool) claimStarted;
 	mapping(address => UserInfo) usersInfo;
