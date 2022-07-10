@@ -1,6 +1,10 @@
-name: run unit tests
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
-on: ["push", "pull_request"]
+name: Unit Tests
 
 env:
   FOUNDRY_PROFILE: ci
@@ -24,5 +28,5 @@ jobs:
 
       - name: Run Forge unit tests
         run: |
-          forge test -vvv --match-path 'test/unit/*.sol'
+          forge test -vvv --match-path 'src/test/unit/*.sol'
         id: test

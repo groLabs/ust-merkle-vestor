@@ -3,7 +3,7 @@ pragma solidity 0.8.10;
 
 import { Test } from 'forge-std/Test.sol';
 import { GMerkleVestor } from 'src/GMerkleVestor.sol';
-import { MockERC20 } from 'src/Mocks/MockERC20.sol';
+import { MockERC20 } from '../mocks/MockERC20.sol';
 
 // merkle data for testing
 // "root": "0x3d716f83ed930b6b542e68b462bb31ab21c4c52810d9a784e6c92f93bf6d7063"
