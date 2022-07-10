@@ -22,13 +22,7 @@ jobs:
         with:
           version: nightly
 
-      - name: Run Forge build
-        run: |
-          forge --version
-          forge build --sizes
-        id: build
-
       - name: Run Forge unit tests
         run: |
-          fforge test -vvv --match-path 'test/unit/*.sol'
+          forge test -vvv --match-path 'test/unit/*.sol'
         id: test
