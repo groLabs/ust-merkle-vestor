@@ -32,6 +32,11 @@ To run unit tests:
 forge test --match-path 'test/unit/*.sol'
 ```
 
+To run fuzz tests:
+```bash
+forge test --match-path 'test/fuzz/*.sol'
+```
+
 ## About Gro
 
 Gro protocol is a stablecoin yield aggregator that tranches risk and yield. The first two products built on it are the PWRD stablecoin with deposit protection and yield, and Vault with leveraged stablecoin yields.
