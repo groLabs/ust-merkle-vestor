@@ -1,6 +1,6 @@
 name: run unit tests
 
-on: workflow_dispatch
+on: ["push", "pull_request"]
 
 env:
   FOUNDRY_PROFILE: ci
