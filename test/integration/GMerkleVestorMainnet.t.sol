@@ -128,7 +128,7 @@ contract GMerkleVestorTestMainnet is Test {
 		vm.warp(midTimestamp);
 		gmerkle.claim();
 		userTokenBalance = token.balanceOf(user);
-		assertEq(userTokenBalance, (userTotalClaim / 2) + 1); //acount for pwrd rounding error
+		assertApproxEqAbs(userTokenBalance, (userTotalClaim / 2), 1); //acount for pwrd rounding error
 		uint256 threeQuaterTimestamp = midTimestamp + (midTimestamp / 2);
 		vm.warp(threeQuaterTimestamp);
 		gmerkle.claim();
@@ -146,11 +146,11 @@ contract GMerkleVestorTestMainnet is Test {
 		vm.warp(gmerkle.vestingEndTime());
 		gmerkle.claim();
 		userTokenBalance = token.balanceOf(user);
-		assertEq(userTokenBalance, (userTotalClaim + 1)); // account for pwrd rounding error
+		assertApproxEqAbs(userTokenBalance, userTotalClaim, 1); // account for pwrd rounding error
 		vm.warp(gmerkle.vestingEndTime() + 86_400); // move timestamp by one day
 		gmerkle.claim();
 		userTokenBalance = token.balanceOf(user);
-		assertEq(userTokenBalance, (userTotalClaim + 1)); // token balance should not change and account for pwrd rounding error
+		assertApproxEqAbs(userTokenBalance, userTotalClaim, 1); // token balance should not change and account for pwrd rounding error
 		vm.stopPrank();
 	}
 
