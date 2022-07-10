@@ -1,4 +1,4 @@
-name: test
+name: run unit tests
 
 on: workflow_dispatch
 
@@ -28,7 +28,7 @@ jobs:
           forge build --sizes
         id: build
 
-      - name: Run Forge tests
+      - name: Run Forge unit tests
         run: |
-          forge test -vvv
+          fforge test -vvv --match-path 'test/unit/*.sol'
         id: test
