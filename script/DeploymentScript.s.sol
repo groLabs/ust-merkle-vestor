@@ -14,6 +14,8 @@ contract DeploymentScript is Script {
 
 		GMerkleVestor gMerkleVestor = new GMerkleVestor(token, vestingStartTime, merkleRoot);
 
+        // TODO remember to transfer ownership to DAO multisig at the end of script 
+
 		vm.stopBroadcast();
 	}
 }
