@@ -37,7 +37,7 @@ To run fuzz tests:
 forge test --match-path 'test/fuzz/*.sol'
 ```
 
-### Running Deployment Script
+### Running Deployment Script
 
 ```bash
 # To load the variables in the .env file
