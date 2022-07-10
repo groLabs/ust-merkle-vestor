@@ -23,31 +23,22 @@ import { MockERC20 } from 'src/Mocks/MockERC20.sol';
 //    ]
 //  }
 
-contract User {
-
-}
-
 contract GMerkleVestorTest is Test {
-	User internal user;
 	MockERC20 internal token;
 	GMerkleVestor internal gmerkle;
+	address internal admin;
+	address internal user;
+	bytes32[] internal proof;
 	uint256 internal testTimestamp;
 	uint256 internal userTotalClaim;
-	bytes32[] internal proof;
-	address internal user2;
 
 	function setUp() public {
-		// deploy contracts
+		// deploy Mock ERC20 contracts
 		token = new MockERC20();
-		user = new User();
-		gmerkle = new GMerkleVestor(
-			address(token),
-			1654811402,
-			0x3d716f83ed930b6b542e68b462bb31ab21c4c52810d9a784e6c92f93bf6d7063
-		);
 
 		// setup common variables
-		user2 = address(0x022Ce4715b44EF6F0eAd8561B29dA676928D16f3);
+		admin = address(0xBA5EDF9dAd66D9D81341eEf8131160c439dbA91B);
+		user = address(0x022Ce4715b44EF6F0eAd8561B29dA676928D16f3);
 		testTimestamp = 1657406456;
 		proof = [
 			bytes32(0xf4af01c1cb283bdb99c03e8e21e4d5302449578c64fcedad0265440b2c4f7a30),
@@ -61,15 +52,20 @@ contract GMerkleVestorTest is Test {
 		];
 		userTotalClaim = 74221418360000000000;
 
-		// Get MockERC20 and transfer to GMerkleVestor
-		vm.startPrank(address(user));
+		// Deploy GMerkleVestor and get MockERC20 and transfer to GMerkleVestor
+		vm.startPrank(address(admin));
+		gmerkle = new GMerkleVestor(
+			address(token), // mock ERC20
+			1654811402, // test start vesting time
+			0x3d716f83ed930b6b542e68b462bb31ab21c4c52810d9a784e6c92f93bf6d7063 // merkle Root
+		);
 		token.faucet();
 		token.transfer(address(gmerkle), 1E23);
 		vm.stopPrank();
 	}
 
 	function testCanClaimMerkleDrop() public {
-		vm.startPrank(user2);
+		vm.startPrank(user);
 		bool canClaim = gmerkle.canClaim(proof, userTotalClaim);
 		assertEq(canClaim, true);
 		vm.stopPrank();
@@ -77,7 +73,7 @@ contract GMerkleVestorTest is Test {
 
 	function testCanSeeVestedAmount() public {
 		vm.warp(testTimestamp);
-		vm.startPrank(user2);
+		vm.startPrank(user);
 		uint256 vestedAmount = gmerkle.getVestedAmount(proof, userTotalClaim);
 		assertGt(vestedAmount, 0);
 		vm.stopPrank();
@@ -85,18 +81,18 @@ contract GMerkleVestorTest is Test {
 
 	function testCanDoInitialClaim() public {
 		vm.warp(testTimestamp);
-		vm.startPrank(user2);
+		vm.startPrank(user);
 		gmerkle.initialClaim(proof, userTotalClaim);
-		uint256 userTokenBalance = token.balanceOf(user2);
+		uint256 userTokenBalance = token.balanceOf(user);
 		assertGt(userTokenBalance, 0);
 		vm.stopPrank();
 	}
 
 	function testUserCannotDoInitialClaimTwice() public {
 		vm.warp(testTimestamp);
-		vm.startPrank(user2);
+		vm.startPrank(user);
 		gmerkle.initialClaim(proof, userTotalClaim);
-		uint256 userTokenBalance = token.balanceOf(user2);
+		uint256 userTokenBalance = token.balanceOf(user);
 		assertGt(userTokenBalance, 0);
 		vm.expectRevert(abi.encodeWithSignature('InitialClaimComplete()'));
 		gmerkle.initialClaim(proof, userTotalClaim);
@@ -105,7 +101,7 @@ contract GMerkleVestorTest is Test {
 
 	function testUserCannotCallClaimWithoutInitialClaimFirst() public {
 		vm.warp(testTimestamp);
-		vm.startPrank(user2);
+		vm.startPrank(user);
 		vm.expectRevert(abi.encodeWithSignature('InitialClaimIncomplete()'));
 		gmerkle.claim();
 		vm.stopPrank();
@@ -114,9 +110,9 @@ contract GMerkleVestorTest is Test {
 	function testUserCanClaimFullAmountOnInitialClaim() public {
 		uint256 endTimestamp = gmerkle.vestingEndTime();
 		vm.warp(endTimestamp);
-		vm.startPrank(user2);
+		vm.startPrank(user);
 		gmerkle.initialClaim(proof, userTotalClaim);
-		uint256 userTokenBalance = token.balanceOf(user2);
+		uint256 userTokenBalance = token.balanceOf(user);
 		assertEq(userTokenBalance, userTotalClaim);
 		vm.stopPrank();
 	}
