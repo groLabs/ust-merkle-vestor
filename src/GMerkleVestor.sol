@@ -24,6 +24,10 @@ contract GMerkleVestor is Ownable {
 	mapping(address => bool) claimStarted;
 	mapping(address => UserInfo) usersInfo;
 
+	error InvalidMerkleProof();
+	error InitialClaimComplete();
+	error InitialClaimIncomplete();
+
 	constructor(
 		address _token,
 		uint256 _vetingStartTime,
@@ -55,7 +59,7 @@ contract GMerkleVestor is Ownable {
 			// create leaf with user address and amount
 			bytes32 leaf = keccak256(abi.encodePacked(msg.sender, _totalClaim));
 			// verify valid proof
-			require(MerkleProof.verify(proof, merkleRoot, leaf), 'getVestedAmount: Invalid Proof');
+			if (!MerkleProof.verify(proof, merkleRoot, leaf)) revert InvalidMerkleProof();
 
 			// calculate how much user has vested that we can send on this inital claim
 			if (block.timestamp < vestingEndTime) {
@@ -89,10 +93,10 @@ contract GMerkleVestor is Ownable {
 		// create leaf with user address and amount
 		bytes32 leaf = keccak256(abi.encodePacked(msg.sender, amount));
 		// verify valid proof
-		require(MerkleProof.verify(proof, merkleRoot, leaf), 'initialClaim: Invalid Proof');
+		if (!MerkleProof.verify(proof, merkleRoot, leaf)) revert InvalidMerkleProof();
 
 		// ensure user hasn't claimed already
-		require(!claimStarted[msg.sender], 'initialClaim: already initially claimed');
+		if (claimStarted[msg.sender]) revert InitialClaimComplete();
 
 		// verify claim started for user
 		claimStarted[msg.sender] = true;
@@ -118,7 +122,7 @@ contract GMerkleVestor is Ownable {
 
 	// TODO natspec later but this suppoed to be cheaper alternative once position started
 	function claim() external {
-		require(claimStarted[msg.sender], 'claim: claim not started');
+		if (!claimStarted[msg.sender]) revert InitialClaimIncomplete();
 
 		// calculate how much user has vested that we can send on this inital claim
 		uint256 currentClaimableAmount;

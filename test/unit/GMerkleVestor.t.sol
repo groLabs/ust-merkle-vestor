@@ -98,7 +98,7 @@ contract GMerkleVestorTest is Test {
 		gmerkle.initialClaim(proof, userTotalClaim);
 		uint256 userTokenBalance = token.balanceOf(user2);
 		assertGt(userTokenBalance, 0);
-		vm.expectRevert(bytes('initialClaim: already initially claimed'));
+		vm.expectRevert(abi.encodeWithSignature('InitialClaimComplete()'));
 		gmerkle.initialClaim(proof, userTotalClaim);
 		vm.stopPrank();
 	}
@@ -106,7 +106,7 @@ contract GMerkleVestorTest is Test {
 	function testUserCannotCallClaimWithoutInitialClaimFirst() public {
 		vm.warp(testTimestamp);
 		vm.startPrank(user2);
-		vm.expectRevert(bytes('claim: claim not started'));
+		vm.expectRevert(abi.encodeWithSignature('InitialClaimIncomplete()'));
 		gmerkle.claim();
 		vm.stopPrank();
 	}
