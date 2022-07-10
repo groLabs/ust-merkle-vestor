@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPLv3
 pragma solidity 0.8.10;
 
-import { console2 } from 'forge-std/console2.sol';
 import { Test } from 'forge-std/Test.sol';
 import { GMerkleVestor } from 'src/GMerkleVestor.sol';
 import { MockERC20 } from 'src/Mocks/MockERC20.sol';
@@ -161,5 +160,10 @@ contract GMerkleVestorTest is Test {
 		assertEq(token.balanceOf(admin), 1E20);
 	}
 
-	function testOnlyOwnerCanSweepToken() public {}
+	function testOnlyOwnerCanSweepToken() public {
+		assertEq(token.balanceOf(user), 0);
+		vm.prank(user);
+		vm.expectRevert(bytes('Ownable: caller is not the owner'));
+		gmerkle.sweep(1E20);
+	}
 }
