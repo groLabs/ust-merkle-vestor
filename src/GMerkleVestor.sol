@@ -118,7 +118,7 @@ contract GMerkleVestor is Ownable {
 
 	// TODO natspec later but this suppoed to be cheaper alternative once position started
 	function claim() external {
-		require(claimStarted[msg.sender] = true, 'claim: claim not started');
+		require(claimStarted[msg.sender], 'claim: claim not started');
 
 		// calculate how much user has vested that we can send on this inital claim
 		uint256 currentClaimableAmount;

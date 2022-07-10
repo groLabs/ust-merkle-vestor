@@ -103,6 +103,14 @@ contract GMerkleVestorTest is Test {
 		vm.stopPrank();
 	}
 
+	function testUserCannotCallClaimWithoutInitialClaimFirst() public {
+		vm.warp(testTimestamp);
+		vm.startPrank(user2);
+		vm.expectRevert(bytes('claim: claim not started'));
+		gmerkle.claim();
+		vm.stopPrank();
+	}
+
 	function testUserCanClaimFullAmountOnInitialClaim() public {
 		uint256 endTimestamp = gmerkle.vestingEndTime();
 		vm.warp(endTimestamp);
