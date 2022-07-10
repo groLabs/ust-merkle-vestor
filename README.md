@@ -37,6 +37,16 @@ To run fuzz tests:
 forge test --match-path 'src/test/fuzz/*.sol'
 ```
 
+### Running Deployment Script
+
+```bash
+# To load the variables in the .env file
+source .env
+
+# To deploy and verify our contract
+forge script script/DeploymentScript.s.sol:DeploymentScript --rpc-url $RPC_URL  --private-key $PRIVATE_KEY --broadcast --verify --etherscan-api-key $ETHERSCAN_KEY -vvvv
+```
+
 ## About Gro
 
 Gro protocol is a stablecoin yield aggregator that tranches risk and yield. The first two products built on it are the PWRD stablecoin with deposit protection and yield, and Vault with leveraged stablecoin yields.
