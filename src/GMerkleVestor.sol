@@ -6,8 +6,27 @@ import { MerkleProof } from 'openzeppelin-contracts/contracts/utils/cryptography
 import { Ownable } from 'openzeppelin-contracts/contracts/access/Ownable.sol';
 import { SafeERC20 } from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
 
+//  ________  ________  ________
+//  |\   ____\|\   __  \|\   __  \
+//  \ \  \___|\ \  \|\  \ \  \|\  \
+//   \ \  \  __\ \   _  _\ \  \\\  \
+//    \ \  \|\  \ \  \\  \\ \  \\\  \
+//     \ \_______\ \__\\ _\\ \_______\
+//      \|_______|\|__|\|__|\|_______|
+
+// gro protocol: https://github.com/groLabs/GSquared
+
+/// @title GMerkleVestor
+/// @notice Setups up a vesting schdule for a distribution token for users
+/// using a merkle tree for claim verification
+/// @dev The operator needs to send the distribution token to the contract for
+/// distributions to work.
 contract GMerkleVestor is Ownable {
 	using SafeERC20 for IERC20;
+
+	/*//////////////////////////////////////////////////////////////
+                    STORAGE VARIABLES & TYPES
+    //////////////////////////////////////////////////////////////*/
 
 	struct UserInfo {
 		uint256 totalClaim;
@@ -24,9 +43,17 @@ contract GMerkleVestor is Ownable {
 	mapping(address => bool) claimStarted;
 	mapping(address => UserInfo) usersInfo;
 
+	/*//////////////////////////////////////////////////////////////
+                            Custom Errors
+    //////////////////////////////////////////////////////////////*/
+
 	error InvalidMerkleProof();
 	error InitialClaimComplete();
 	error InitialClaimIncomplete();
+
+	/*//////////////////////////////////////////////////////////////
+                            Constructor
+    //////////////////////////////////////////////////////////////*/
 
 	constructor(
 		address _token,
@@ -39,7 +66,14 @@ contract GMerkleVestor is Ownable {
 		vestingEndTime = _vetingStartTime + VESTING_TIME;
 	}
 
-	// TODO write natspec this is for user to check if they part of merkle tree
+	/*//////////////////////////////////////////////////////////////
+                            Core Logic
+    //////////////////////////////////////////////////////////////*/
+
+	/// @notice let's the user check if they are part of the merkle tree with their proof
+	/// @param proof merkle proof to generate the leaf for the merkle tree
+	/// @param amount the total amount the user can claim at the end of their vest
+	/// @return boolean showing if a user can claim with their proof
 	function canClaim(bytes32[] memory proof, uint256 amount) external view returns (bool) {
 		// create leaf with user address and amount
 		bytes32 leaf = keccak256(abi.encodePacked(msg.sender, amount));
@@ -47,7 +81,10 @@ contract GMerkleVestor is Ownable {
 		return MerkleProof.verify(proof, merkleRoot, leaf);
 	}
 
-	// TODO write natspec, this is a helper func for users to check how much they can currently claim
+	/// @notice let's the user see what they can currently claim
+	/// @param proof merkle proof to generate the leaf for the merkle tree
+	/// @param  _totalClaim the total amount the user can claim at the end of their vest
+	/// @return The current vested amount a user can claim minus any amount claimed prior
 	function getVestedAmount(bytes32[] memory proof, uint256 _totalClaim)
 		external
 		view
@@ -88,7 +125,10 @@ contract GMerkleVestor is Ownable {
 		return currentClaimableAmount;
 	}
 
-	// TODO Write natspec this is to setup a users position and first claim
+	/// @notice The function the user calls for their first claim to setup their vesting
+	/// position and get their initial vested amount depending on when they claim
+	/// @param proof merkle proof to generate the leaf for the merkle tree
+	/// @param amount the total amount the user can claim at the end of their vest
 	function initialClaim(bytes32[] memory proof, uint256 amount) external {
 		// create leaf with user address and amount
 		bytes32 leaf = keccak256(abi.encodePacked(msg.sender, amount));
@@ -120,7 +160,8 @@ contract GMerkleVestor is Ownable {
 		IERC20(token).safeTransfer(msg.sender, currentClaimableAmount);
 	}
 
-	// TODO natspec later but this suppoed to be cheaper alternative once position started
+	/// @notice The function a user should call when they are making ongoing claims
+	/// after their intiial claim
 	function claim() external {
 		if (!claimStarted[msg.sender]) revert InitialClaimIncomplete();
 
@@ -146,6 +187,9 @@ contract GMerkleVestor is Ownable {
 		IERC20(token).safeTransfer(msg.sender, currentClaimableAmount);
 	}
 
+	/// @notice Gives the ability for the owner to transfer themselves
+	/// any amount of the distribution token the contract holds
+	/// @param _amount amount of token to send to the owner
 	function sweep(uint256 _amount) external onlyOwner {
 		// transfer funds to user
 		IERC20(token).safeTransfer(owner(), _amount);
