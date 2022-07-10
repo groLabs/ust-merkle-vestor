@@ -92,7 +92,7 @@ contract GMerkleVestor is Ownable {
 		require(MerkleProof.verify(proof, merkleRoot, leaf), 'initialClaim: Invalid Proof');
 
 		// ensure user hasn't claimed already
-		require(claimStarted[msg.sender] = false, 'initialClaim: already initially claimed');
+		require(!claimStarted[msg.sender], 'initialClaim: already initially claimed');
 
 		// verify claim started for user
 		claimStarted[msg.sender] = true;
