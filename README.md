@@ -24,17 +24,17 @@ forge build
 
 To run integration tests:
 ```bash
-forge test --fork-url 'https://eth-mainnet.alchemyapi.io/v2/EiZDRdakYiF2yish4tYa9F0aodR9z3Yp' --match-path 'src/test/integration/*.sol'
+forge test --fork-url 'https://eth-mainnet.alchemyapi.io/v2/EiZDRdakYiF2yish4tYa9F0aodR9z3Yp' --match-path 'test/integration/*.sol'
 ```
 
 To run unit tests:
 ```bash
-forge test --match-path 'src/test/unit/*.sol'
+forge test --match-path 'test/unit/*.sol'
 ```
 
 To run fuzz tests:
 ```bash
-forge test --match-path 'src/test/fuzz/*.sol'
+forge test --match-path 'test/fuzz/*.sol'
 ```
 
 ### Running Deployment Script

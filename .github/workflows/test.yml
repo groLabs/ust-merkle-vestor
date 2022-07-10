@@ -28,5 +28,5 @@ jobs:
 
       - name: Run Forge unit tests
         run: |
-          forge test -vvv --match-path 'src/test/unit/*.sol'
+          forge test -vvv --match-path 'test/unit/*.sol'
         id: test
