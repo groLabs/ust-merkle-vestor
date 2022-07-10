@@ -117,7 +117,25 @@ contract GMerkleVestorTest is Test {
 		vm.stopPrank();
 	}
 
-	function testUserCanClaimInitialAmountAndOnGoingClaim() public {}
+	function testUserCanClaimInitialAmountAndOnGoingClaim() public {
+		vm.warp(testTimestamp);
+		vm.startPrank(user);
+		gmerkle.initialClaim(proof, userTotalClaim);
+		uint256 userTokenBalance = token.balanceOf(user);
+		assertGt(userTokenBalance, 0);
+		uint256 midTimestamp = ((gmerkle.vestingEndTime() - gmerkle.vestingStartTime()) / 2) +
+			gmerkle.vestingStartTime();
+		vm.warp(midTimestamp);
+		gmerkle.claim();
+		userTokenBalance = token.balanceOf(user);
+		assertEq(userTokenBalance, userTotalClaim / 2);
+		uint256 threeQuaterTimestamp = midTimestamp + (midTimestamp / 2);
+		vm.warp(threeQuaterTimestamp);
+		gmerkle.claim();
+		userTokenBalance = token.balanceOf(user);
+		assertGt(userTokenBalance, userTotalClaim / 2);
+		vm.stopPrank();
+	}
 
 	function testOwnerCanSweepToken() public {}
 
