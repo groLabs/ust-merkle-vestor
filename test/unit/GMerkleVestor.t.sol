@@ -154,7 +154,12 @@ contract GMerkleVestorTest is Test {
 		vm.stopPrank();
 	}
 
-	function testOwnerCanSweepToken() public {}
+	function testOwnerCanSweepToken() public {
+		assertEq(token.balanceOf(admin), 0);
+		vm.prank(admin);
+		gmerkle.sweep(1E20);
+		assertEq(token.balanceOf(admin), 1E20);
+	}
 
 	function testOnlyOwnerCanSweepToken() public {}
 }
