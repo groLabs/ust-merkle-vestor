@@ -66,8 +66,7 @@ contract GMerkleVestorFuzzTest is Test {
 	function testFailCanDoInitialClaim(uint256 _claimableAmount) public {
 		vm.warp(testTimestamp);
 		vm.prank(user);
-        vm.assume(_claimableAmount != userTotalClaim);
+		vm.assume(_claimableAmount != userTotalClaim);
 		gmerkle.initialClaim(proof, _claimableAmount);
 	}
-
 }
