@@ -24,7 +24,11 @@ forge build
 
 To run integration tests:
 ```bash
-forge test --fork-url 'https://eth-mainnet.alchemyapi.io/v2/EiZDRdakYiF2yish4tYa9F0aodR9z3Yp' --match-path 'test/integration/*.sol'
+# first load .env files
+source .env
+
+# run tests
+forge test --fork-url $MAINNET_FORK_URL --match-path 'test/integration/*.sol'
 ```
 
 To run unit tests:
@@ -47,6 +51,18 @@ source .env
 forge script script/DeploymentScript.s.sol:DeploymentScript --rpc-url $RPC_URL  --private-key $PRIVATE_KEY --broadcast --verify --etherscan-api-key $ETHERSCAN_KEY -vvvv
 ```
 
+To test locally on mainnet fork:
+``` bash
+# load .env variables
+source .env
+
+# First startup anvil mainnet fork
+anvil --fork-url $MAINNET_FORK_URL
+
+# run script against fork to deploy contract
+forge script script/DeploymentScript.s.sol:DeploymentScript --rpc-url $LOCAL_RPC_URL  --private-key $PRIVATE_KEY --broadcast -vvvv
+```
+
 ## About Gro
 
 Gro protocol is a stablecoin yield aggregator that tranches risk and yield. The first two products built on it are the PWRD stablecoin with deposit protection and yield, and Vault with leveraged stablecoin yields.
@@ -54,3 +70,5 @@ Gro protocol is a stablecoin yield aggregator that tranches risk and yield. The 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/59924029/176437952-f34274d7-219a-41ad-8a64-45dd7be2cc28.svg" height="100" />
 </p>
+
+# 0x24819c206f5c24b9a9137587382954820f9fe0ca
