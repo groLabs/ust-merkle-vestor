@@ -39,9 +39,9 @@ contract GMerkleVestor is Ownable {
 	address public immutable token;
 	uint256 public immutable vestingStartTime;
 	uint256 public immutable vestingEndTime;
-	bytes32 immutable merkleRoot;
-	mapping(address => bool) claimStarted;
-	mapping(address => UserInfo) usersInfo;
+	bytes32 public immutable merkleRoot;
+	mapping(address => bool) public claimStarted;
+	mapping(address => UserInfo) public usersInfo;
 
 	/*//////////////////////////////////////////////////////////////
                             Custom Errors
