@@ -71,4 +71,3 @@ Gro protocol is a stablecoin yield aggregator that tranches risk and yield. The 
   <img src="https://user-images.githubusercontent.com/59924029/176437952-f34274d7-219a-41ad-8a64-45dd7be2cc28.svg" height="100" />
 </p>
 
-# 0x24819c206f5c24b9a9137587382954820f9fe0ca
