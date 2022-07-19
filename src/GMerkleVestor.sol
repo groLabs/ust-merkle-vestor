@@ -84,17 +84,18 @@ contract GMerkleVestor is Ownable {
 	/// @notice let's the user see what they can currently claim
 	/// @param proof merkle proof to generate the leaf for the merkle tree
 	/// @param  _totalClaim the total amount the user can claim at the end of their vest
+	/// @param  _user address of the claimer
 	/// @return The current vested amount a user can claim minus any amount claimed prior
-	function getVestedAmount(bytes32[] memory proof, uint256 _totalClaim)
-		external
-		view
-		returns (uint256)
-	{
+	function getVestedAmount(
+		bytes32[] memory proof,
+		uint256 _totalClaim,
+		address _user
+	) external view returns (uint256) {
 		uint256 currentClaimableAmount;
 		// If user hasn't started a claim yet calculate vested amount
 		if (!claimStarted[msg.sender]) {
 			// create leaf with user address and amount
-			bytes32 leaf = keccak256(abi.encodePacked(msg.sender, _totalClaim));
+			bytes32 leaf = keccak256(abi.encodePacked(_user, _totalClaim));
 			// verify valid proof
 			if (!MerkleProof.verify(proof, merkleRoot, leaf)) revert InvalidMerkleProof();
 

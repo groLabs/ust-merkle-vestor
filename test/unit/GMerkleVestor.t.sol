@@ -73,8 +73,16 @@ contract GMerkleVestorTest is Test {
 	function testCanSeeVestedAmount() public {
 		vm.warp(testTimestamp);
 		vm.startPrank(user);
-		uint256 vestedAmount = gmerkle.getVestedAmount(proof, userTotalClaim);
+		uint256 vestedAmount = gmerkle.getVestedAmount(proof, userTotalClaim, user);
 		assertGt(vestedAmount, 0);
+		vm.stopPrank();
+	}
+
+	function testCanNotSeeVestedAmountWithIncorrectAddress() public {
+		vm.warp(testTimestamp);
+		vm.startPrank(user);
+		vm.expectRevert(abi.encodeWithSignature('InvalidMerkleProof()'));
+		gmerkle.getVestedAmount(proof, userTotalClaim, address(0));
 		vm.stopPrank();
 	}
 
