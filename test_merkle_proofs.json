@@ -1,0 +1,29 @@
+{
+    "root": "0x14cfd2dc89ab4fa01792096057603b59e007613dc95b08e1030f061dd394cb02",
+    "total": "1300000000000000000000",
+    "airdrops": [
+      {
+        "address": "0x022Ce4715b44EF6F0eAd8561B29dA676928D16f3",
+        "amount": "100000000000000000000",
+        "proofs": [
+          "0x4ba7b9965c3d6567d0431f07832196dd222898ef78228f681572584481da51f4",
+          "0x8b8e5de5838c70531ef2f0abb632760c32dc4a3c9d76c98667d526a0d022db38"
+        ]
+      },
+      {
+        "address": "0x02A4496aFD423B2B36a34D7F6E918e71Ca88898B",
+        "amount": "200000000000000000000",
+        "proofs": [
+          "0x2a7f84390b91aebf64db29701aca4f281b9f21a41cece653d78b3ed23c74920f",
+          "0x8b8e5de5838c70531ef2f0abb632760c32dc4a3c9d76c98667d526a0d022db38"
+        ]
+      },
+      {
+        "address": "0x106E7ECA4A0DAc78EadfaB1FeA20336290694139",
+        "amount": "1000000000000000000000",
+        "proofs": [
+          "0x97bee36d34720a4113a8a8576710a66450e219c99b9d9c542387512e90a11d13"
+        ]
+      }
+    ]
+  }
