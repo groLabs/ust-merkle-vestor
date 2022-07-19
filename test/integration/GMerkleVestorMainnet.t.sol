@@ -74,7 +74,7 @@ contract GMerkleVestorTestMainnet is Test {
 	function testCanSeeVestedAmount() public {
 		vm.warp(testTimestamp);
 		vm.startPrank(user);
-		uint256 vestedAmount = gmerkle.getVestedAmount(proof, userTotalClaim);
+		uint256 vestedAmount = gmerkle.getVestedAmount(proof, userTotalClaim, user);
 		assertGt(vestedAmount, 0);
 		vm.stopPrank();
 	}
