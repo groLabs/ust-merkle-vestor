@@ -28,7 +28,7 @@ To run integration tests:
 source .env
 
 # run tests
-forge test --fork-url $MAINNET_FORK_URL --match-path 'test/integration/*.sol'
+forge test --fork-url $ETH_RPC_URL --match-path 'test/integration/*.sol'
 ```
 
 To run unit tests:
