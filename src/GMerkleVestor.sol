@@ -33,7 +33,7 @@ contract GMerkleVestor is Ownable {
 		uint256 claimedAmount;
 	}
 
-	uint256 internal constant ONE_MONTH_SECONDS = 2592000; //60 * 60 * 24 * 30 (30 day months)
+	uint256 internal constant ONE_MONTH_SECONDS = 2629746; // average year (including leap years) in seconds / 12
 	uint256 internal constant VESTING_TIME = ONE_MONTH_SECONDS * 23; // 2 years period - 1 month
 	uint256 internal constant ONE_WEEK_SECONDS = 604800;
 
