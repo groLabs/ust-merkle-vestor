@@ -161,17 +161,26 @@ contract GMerkleVestorTest is Test {
 		vm.stopPrank();
 	}
 
-	function testOwnerCanSweepToken() public {
+	function testOnlyOwnerCanSweepToken() public {
+		assertEq(token.balanceOf(user), 0);
+		vm.prank(user);
+		vm.expectRevert(bytes('Ownable: caller is not the owner'));
+		gmerkle.sweep(1E20);
+	}
+
+	function testOnlyOwnerCanSweepTokensAfterDeadline() public {
 		assertEq(token.balanceOf(admin), 0);
+		uint256 secondsInWeek = 604800;
+		vm.warp(gmerkle.vestingEndTime() + secondsInWeek);
 		vm.prank(admin);
 		gmerkle.sweep(1E20);
 		assertEq(token.balanceOf(admin), 1E20);
 	}
 
-	function testOnlyOwnerCanSweepToken() public {
-		assertEq(token.balanceOf(user), 0);
-		vm.prank(user);
-		vm.expectRevert(bytes('Ownable: caller is not the owner'));
+	function testOwnerCannotSweepTokensBeforeDeadline() public {
+		vm.warp(gmerkle.vestingEndTime());
+		vm.prank(admin);
+		vm.expectRevert(abi.encodeWithSignature('SweepDeadlineNotPassed()'));
 		gmerkle.sweep(1E20);
 	}
 }

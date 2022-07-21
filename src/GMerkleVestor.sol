@@ -35,6 +35,7 @@ contract GMerkleVestor is Ownable {
 
 	uint256 internal constant ONE_MONTH_SECONDS = 2592000; //60 * 60 * 24 * 30 (30 day months)
 	uint256 internal constant VESTING_TIME = ONE_MONTH_SECONDS * 23; // 2 years period - 1 month
+	uint256 internal constant ONE_WEEK_SECONDS = 604800;
 
 	address public immutable token;
 	uint256 public immutable vestingStartTime;
@@ -50,6 +51,7 @@ contract GMerkleVestor is Ownable {
 	error InvalidMerkleProof();
 	error InitialClaimComplete();
 	error InitialClaimIncomplete();
+	error SweepDeadlineNotPassed();
 
 	/*//////////////////////////////////////////////////////////////
                             Constructor
@@ -192,6 +194,7 @@ contract GMerkleVestor is Ownable {
 	/// any amount of the distribution token the contract holds
 	/// @param _amount amount of token to send to the owner
 	function sweep(uint256 _amount) external onlyOwner {
+		if (block.timestamp < vestingEndTime + ONE_WEEK_SECONDS) revert SweepDeadlineNotPassed();
 		// transfer funds to user
 		IERC20(token).safeTransfer(owner(), _amount);
 	}
