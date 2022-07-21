@@ -113,7 +113,7 @@ contract GMerkleVestorTestMainnet is Test {
 		vm.startPrank(user);
 		gmerkle.initialClaim(proof, userTotalClaim);
 		uint256 userTokenBalance = token.balanceOf(user);
-		assertEq(userTokenBalance, userTotalClaim);
+		assertApproxEqAbs(userTokenBalance, userTotalClaim, 1);
 		vm.stopPrank();
 	}
 
