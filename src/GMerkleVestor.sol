@@ -40,6 +40,7 @@ contract GMerkleVestor is Ownable {
 	address public immutable token;
 	uint256 public immutable vestingStartTime;
 	uint256 public immutable vestingEndTime;
+    uint256 public immutable deploymentTime;
 	bytes32 public immutable merkleRoot;
 	mapping(address => bool) public claimStarted;
 	mapping(address => UserInfo) public usersInfo;
@@ -66,6 +67,7 @@ contract GMerkleVestor is Ownable {
 		vestingStartTime = _vetingStartTime;
 		merkleRoot = _merkleRoot;
 		vestingEndTime = _vetingStartTime + VESTING_TIME;
+        deploymentTime = block.timestamp;
 	}
 
 	/*//////////////////////////////////////////////////////////////
@@ -194,8 +196,14 @@ contract GMerkleVestor is Ownable {
 	/// any amount of the distribution token the contract holds
 	/// @param _amount amount of token to send to the owner
 	function sweep(uint256 _amount) external onlyOwner {
+		if (block.timestamp < deploymentTime + ONE_WEEK_SECONDS) {
+			// transfer funds to owner
+			IERC20(token).safeTransfer(owner(), _amount);
+			return;
+		}
+
 		if (block.timestamp < vestingEndTime + ONE_WEEK_SECONDS) revert SweepDeadlineNotPassed();
-		// transfer funds to user
+		// transfer funds to owner
 		IERC20(token).safeTransfer(owner(), _amount);
 	}
 }
