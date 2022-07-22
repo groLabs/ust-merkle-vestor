@@ -54,7 +54,8 @@ contract GMerkleVestor is Ownable {
 	/*//////////////////////////////////////////////////////////////
                             Events
     //////////////////////////////////////////////////////////////*/
-	event LogInitialClaim(address indexed user, uint256 amount);
+
+	event LogInitialClaim(address indexed user, uint256 totalClaim, uint256 claimAmount);
 	event LogClaim(address indexed user, uint256 amount);
 
 	/*//////////////////////////////////////////////////////////////
@@ -167,7 +168,7 @@ contract GMerkleVestor is Ownable {
 		IERC20(token).safeTransfer(msg.sender, currentClaimableAmount);
 
 		// emit event
-		emit LogInitialClaim(msg.sender, currentClaimableAmount);
+		emit LogInitialClaim(msg.sender, amount, currentClaimableAmount);
 	}
 
 	/// @notice The function a user should call when they are making ongoing claims
