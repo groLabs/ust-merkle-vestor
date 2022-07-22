@@ -67,7 +67,7 @@ contract GMerkleVestor is Ownable {
 		vestingStartTime = _vetingStartTime;
 		merkleRoot = _merkleRoot;
 		vestingEndTime = _vetingStartTime + VESTING_TIME;
-        deploymentTime = block.timestamp;
+                deploymentTime = block.timestamp;
 	}
 
 	/*//////////////////////////////////////////////////////////////
