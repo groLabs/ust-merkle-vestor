@@ -52,6 +52,13 @@ contract GMerkleVestor is Ownable {
 	error InitialClaimIncomplete();
 
 	/*//////////////////////////////////////////////////////////////
+                            Events
+    //////////////////////////////////////////////////////////////*/
+
+	event LogInitialClaim(address indexed user, uint256 totalClaim, uint256 claimAmount);
+	event LogClaim(address indexed user, uint256 amount);
+
+	/*//////////////////////////////////////////////////////////////
                             Constructor
     //////////////////////////////////////////////////////////////*/
 
@@ -159,6 +166,9 @@ contract GMerkleVestor is Ownable {
 
 		// transfer funds to user
 		IERC20(token).safeTransfer(msg.sender, currentClaimableAmount);
+
+		// emit event
+		emit LogInitialClaim(msg.sender, amount, currentClaimableAmount);
 	}
 
 	/// @notice The function a user should call when they are making ongoing claims
@@ -186,6 +196,9 @@ contract GMerkleVestor is Ownable {
 
 		// transfer funds to user
 		IERC20(token).safeTransfer(msg.sender, currentClaimableAmount);
+
+		// emit event
+		emit LogClaim(msg.sender, currentClaimableAmount);
 	}
 
 	/// @notice Gives the ability for the owner to transfer themselves
