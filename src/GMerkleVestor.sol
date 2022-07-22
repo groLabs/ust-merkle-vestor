@@ -33,12 +33,14 @@ contract GMerkleVestor is Ownable {
 		uint256 claimedAmount;
 	}
 
-	uint256 internal constant ONE_MONTH_SECONDS = 2592000; //60 * 60 * 24 * 30 (30 day months)
+	uint256 internal constant ONE_MONTH_SECONDS = 2629746; // average year (including leap years) in seconds / 12
 	uint256 internal constant VESTING_TIME = ONE_MONTH_SECONDS * 23; // 2 years period - 1 month
+	uint256 internal constant ONE_WEEK_SECONDS = 604800;
 
 	address public immutable token;
 	uint256 public immutable vestingStartTime;
 	uint256 public immutable vestingEndTime;
+        uint256 public immutable deploymentTime;
 	bytes32 public immutable merkleRoot;
 	mapping(address => bool) public claimStarted;
 	mapping(address => UserInfo) public usersInfo;
@@ -50,6 +52,7 @@ contract GMerkleVestor is Ownable {
 	error InvalidMerkleProof();
 	error InitialClaimComplete();
 	error InitialClaimIncomplete();
+	error SweepDeadlineNotPassed();
 
 	/*//////////////////////////////////////////////////////////////
                             Events
@@ -71,6 +74,7 @@ contract GMerkleVestor is Ownable {
 		vestingStartTime = _vetingStartTime;
 		merkleRoot = _merkleRoot;
 		vestingEndTime = _vetingStartTime + VESTING_TIME;
+                deploymentTime = block.timestamp;
 	}
 
 	/*//////////////////////////////////////////////////////////////
@@ -205,7 +209,14 @@ contract GMerkleVestor is Ownable {
 	/// any amount of the distribution token the contract holds
 	/// @param _amount amount of token to send to the owner
 	function sweep(uint256 _amount) external onlyOwner {
-		// transfer funds to user
+		if (block.timestamp < deploymentTime + ONE_WEEK_SECONDS) {
+			// transfer funds to owner
+			IERC20(token).safeTransfer(owner(), _amount);
+			return;
+		}
+
+		if (block.timestamp < vestingEndTime + ONE_WEEK_SECONDS) revert SweepDeadlineNotPassed();
+		// transfer funds to owner
 		IERC20(token).safeTransfer(owner(), _amount);
 	}
 }
