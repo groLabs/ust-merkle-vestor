@@ -42,7 +42,6 @@ contract GMerkleVestor is Ownable {
 	uint256 public immutable vestingEndTime;
 	uint256 public immutable deploymentTime;
 	bytes32 public immutable merkleRoot;
-	mapping(address => bool) public claimStarted;
 	mapping(address => UserInfo) public usersInfo;
 
 	/*//////////////////////////////////////////////////////////////
@@ -102,9 +101,12 @@ contract GMerkleVestor is Ownable {
 		uint256 _totalClaim,
 		address _user
 	) external view returns (uint256) {
+		// calculate how much user has vested accounting for claims already made
+		UserInfo memory currentPosition = usersInfo[_user];
+
 		uint256 currentClaimableAmount;
 		// If user hasn't started a claim yet calculate vested amount
-		if (!claimStarted[_user]) {
+		if (currentPosition.claimedAmount == 0) {
 			// create leaf with user address and amount
 			bytes32 leaf = keccak256(abi.encodePacked(_user, _totalClaim));
 			// verify valid proof
@@ -121,9 +123,6 @@ contract GMerkleVestor is Ownable {
 
 			return currentClaimableAmount;
 		}
-
-		// calculate how much user has vested accounting for claims already made
-		UserInfo memory currentPosition = usersInfo[_user];
 
 		if (block.timestamp < vestingEndTime) {
 			currentClaimableAmount =
