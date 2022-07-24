@@ -148,10 +148,7 @@ contract GMerkleVestor is Ownable {
 		if (!MerkleProof.verify(proof, merkleRoot, leaf)) revert InvalidMerkleProof();
 
 		// ensure user hasn't claimed already
-		if (claimStarted[msg.sender]) revert InitialClaimComplete();
-
-		// verify claim started for user
-		claimStarted[msg.sender] = true;
+		if (usersInfo[msg.sender].claimedAmount > 0) revert InitialClaimComplete();
 
 		// calculate how much user has vested that we can send on this inital claim
 		uint256 currentClaimableAmount;
@@ -165,8 +162,7 @@ contract GMerkleVestor is Ownable {
 		}
 
 		// update usersInfo mapping
-		UserInfo memory newUser = UserInfo(amount, currentClaimableAmount);
-		usersInfo[msg.sender] = newUser;
+		usersInfo[msg.sender] = UserInfo(amount, currentClaimableAmount);
 
 		// transfer funds to user
 		IERC20(token).safeTransfer(msg.sender, currentClaimableAmount);
@@ -178,11 +174,11 @@ contract GMerkleVestor is Ownable {
 	/// @notice The function a user should call when they are making ongoing claims
 	/// after their intiial claim
 	function claim() external {
-		if (!claimStarted[msg.sender]) revert InitialClaimIncomplete();
+		UserInfo memory currentPosition = usersInfo[msg.sender];
+		if (currentPosition.claimedAmount == 0) revert InitialClaimIncomplete();
 
 		// calculate how much user has vested that we can send on this inital claim
 		uint256 currentClaimableAmount;
-		UserInfo memory currentPosition = usersInfo[msg.sender];
 
 		if (block.timestamp < vestingEndTime) {
 			currentClaimableAmount =
