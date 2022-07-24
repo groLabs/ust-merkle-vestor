@@ -28,9 +28,10 @@ contract GMerkleVestor is Ownable {
                     STORAGE VARIABLES & TYPES
     //////////////////////////////////////////////////////////////*/
 
+	// we can pack into one slot as totalClaim is less max type(uint128).max
 	struct UserInfo {
-		uint256 totalClaim;
-		uint256 claimedAmount;
+		uint128 totalClaim;
+		uint128 claimedAmount;
 	}
 
 	uint256 internal constant ONE_MONTH_SECONDS = 2629746; // average year (including leap years) in seconds / 12
@@ -161,7 +162,8 @@ contract GMerkleVestor is Ownable {
 		}
 
 		// update usersInfo mapping
-		usersInfo[msg.sender] = UserInfo(amount, currentClaimableAmount);
+		// we can downcast safely as the max value of account is less than type(uint128).max
+		usersInfo[msg.sender] = UserInfo(uint128(amount), uint128(currentClaimableAmount));
 
 		// transfer funds to user
 		IERC20(token).safeTransfer(msg.sender, currentClaimableAmount);
@@ -190,8 +192,8 @@ contract GMerkleVestor is Ownable {
 
 		// update claimed amount for user in storage
 		usersInfo[msg.sender].claimedAmount =
-			currentPosition.claimedAmount +
-			currentClaimableAmount;
+			uint128(currentPosition.claimedAmount) +
+			uint128(currentClaimableAmount);
 
 		// transfer funds to user
 		IERC20(token).safeTransfer(msg.sender, currentClaimableAmount);
