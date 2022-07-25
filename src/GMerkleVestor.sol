@@ -28,9 +28,10 @@ contract GMerkleVestor is Ownable {
                     STORAGE VARIABLES & TYPES
     //////////////////////////////////////////////////////////////*/
 
+	// we can pack into one slot as totalClaim is less max type(uint128).max
 	struct UserInfo {
-		uint256 totalClaim;
-		uint256 claimedAmount;
+		uint128 totalClaim;
+		uint128 claimedAmount;
 	}
 
 	uint256 internal constant ONE_MONTH_SECONDS = 2629746; // average year (including leap years) in seconds / 12
@@ -42,7 +43,6 @@ contract GMerkleVestor is Ownable {
 	uint256 public immutable vestingEndTime;
 	uint256 public immutable deploymentTime;
 	bytes32 public immutable merkleRoot;
-	mapping(address => bool) public claimStarted;
 	mapping(address => UserInfo) public usersInfo;
 
 	/*//////////////////////////////////////////////////////////////
@@ -102,9 +102,12 @@ contract GMerkleVestor is Ownable {
 		uint256 _totalClaim,
 		address _user
 	) external view returns (uint256) {
+		// calculate how much user has vested accounting for claims already made
+		UserInfo memory currentPosition = usersInfo[_user];
+
 		uint256 currentClaimableAmount;
 		// If user hasn't started a claim yet calculate vested amount
-		if (!claimStarted[_user]) {
+		if (currentPosition.claimedAmount == 0) {
 			// create leaf with user address and amount
 			bytes32 leaf = keccak256(abi.encodePacked(_user, _totalClaim));
 			// verify valid proof
@@ -121,9 +124,6 @@ contract GMerkleVestor is Ownable {
 
 			return currentClaimableAmount;
 		}
-
-		// calculate how much user has vested accounting for claims already made
-		UserInfo memory currentPosition = usersInfo[_user];
 
 		if (block.timestamp < vestingEndTime) {
 			currentClaimableAmount =
@@ -148,10 +148,7 @@ contract GMerkleVestor is Ownable {
 		if (!MerkleProof.verify(proof, merkleRoot, leaf)) revert InvalidMerkleProof();
 
 		// ensure user hasn't claimed already
-		if (claimStarted[msg.sender]) revert InitialClaimComplete();
-
-		// verify claim started for user
-		claimStarted[msg.sender] = true;
+		if (usersInfo[msg.sender].claimedAmount > 0) revert InitialClaimComplete();
 
 		// calculate how much user has vested that we can send on this inital claim
 		uint256 currentClaimableAmount;
@@ -165,8 +162,8 @@ contract GMerkleVestor is Ownable {
 		}
 
 		// update usersInfo mapping
-		UserInfo memory newUser = UserInfo(amount, currentClaimableAmount);
-		usersInfo[msg.sender] = newUser;
+		// we can downcast safely as the max value of account is less than type(uint128).max
+		usersInfo[msg.sender] = UserInfo(uint128(amount), uint128(currentClaimableAmount));
 
 		// transfer funds to user
 		IERC20(token).safeTransfer(msg.sender, currentClaimableAmount);
@@ -178,11 +175,11 @@ contract GMerkleVestor is Ownable {
 	/// @notice The function a user should call when they are making ongoing claims
 	/// after their intiial claim
 	function claim() external {
-		if (!claimStarted[msg.sender]) revert InitialClaimIncomplete();
+		UserInfo memory currentPosition = usersInfo[msg.sender];
+		if (currentPosition.claimedAmount == 0) revert InitialClaimIncomplete();
 
 		// calculate how much user has vested that we can send on this inital claim
 		uint256 currentClaimableAmount;
-		UserInfo memory currentPosition = usersInfo[msg.sender];
 
 		if (block.timestamp < vestingEndTime) {
 			currentClaimableAmount =
@@ -195,8 +192,8 @@ contract GMerkleVestor is Ownable {
 
 		// update claimed amount for user in storage
 		usersInfo[msg.sender].claimedAmount =
-			currentPosition.claimedAmount +
-			currentClaimableAmount;
+			uint128(currentPosition.claimedAmount) +
+			uint128(currentClaimableAmount);
 
 		// transfer funds to user
 		IERC20(token).safeTransfer(msg.sender, currentClaimableAmount);
