@@ -203,7 +203,8 @@ contract GMerkleVestor is Ownable {
 	}
 
 	/// @notice Gives the ability for the owner to transfer themselves
-	/// any amount of the distribution token the contract holds
+	/// any amount of the distribution token the contract holds after
+	/// the vesting deadline has finished in case there are excess funds left
 	/// @param _amount amount of token to send to the owner
 	function sweep(uint256 _amount) external onlyOwner {
 		if (block.timestamp < deploymentTime + ONE_WEEK_SECONDS) {
