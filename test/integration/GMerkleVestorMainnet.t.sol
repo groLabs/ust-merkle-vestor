@@ -170,6 +170,15 @@ contract GMerkleVestorTestMainnet is Test {
 		assertEq(token.balanceOf(admin), 1E20);
 	}
 
+	function testOnlyOwnerCanSweepTokensinFirstWeek() public {
+		assertEq(token.balanceOf(admin), 0);
+		uint256 secondsInWeek = 604800;
+		vm.warp(gmerkle.deploymentTime() + secondsInWeek - 1);
+		vm.prank(admin);
+		gmerkle.sweep(1E20);
+		assertEq(token.balanceOf(admin), 1E20);
+	}
+
 	function testOwnerCannotSweepTokensBeforeDeadline() public {
 		vm.warp(gmerkle.vestingEndTime());
 		vm.prank(admin);
